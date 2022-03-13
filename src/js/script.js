@@ -4,19 +4,21 @@ form.addEventListener('submit', (event) => {
   event.preventDefault();
 
   const tasks = document.querySelector('#tasks');
-  const todo = document.querySelector('#todo').value;
+  const todo = document.querySelector('#todo');
+  const todoValue = todo.value;
 
-  if (!!todo) {
+  if (!!todoValue) {
     const idTask = Math.random() * Math.random();
     tasks.insertAdjacentHTML(
       'afterbegin',
       `<div>
         <input type="checkbox" id="task${idTask}" class="task">
-        <label for="task${idTask}">${todo}</label>
+        <label for="task${idTask}">${todoValue}</label>
         <span class="clean-task">X</span>
       </div>`
     );
     addCleanTask();
+    todo.value = '';
   }
 });
 
