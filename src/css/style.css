@@ -1,3 +1,7 @@
+.header {
+  text-align: center;
+}
+
 input:checked + label {
   text-decoration: line-through;
 }
