@@ -1,3 +1,14 @@
+document.body.onload = () => {
+  const tasks = document.querySelector('#tasks');
+
+  if (getLocalStorage()) {
+    tasks.innerHTML = getLocalStorage();
+  }
+
+  addCleanTask();
+  setButtonCleanAllVisibility();
+};
+
 function setButtonCleanAllVisibility() {
   const tasks = document.querySelector('#tasks');
   const cleanAll = document.querySelector('#clean-all');
@@ -9,14 +20,13 @@ function setButtonCleanAllVisibility() {
   }
 }
 
-setButtonCleanAllVisibility();
-
 const cleanAll = document.querySelector('#clean-all');
 
 cleanAll.addEventListener('click', (event) => {
   const tasks = document.querySelector('#tasks');
   tasks.innerHTML = '';
   setButtonCleanAllVisibility();
+  setLocalStorage(tasks);
 });
 
 const form = document.querySelector('form');
@@ -33,6 +43,7 @@ function createTask() {
   if (validateTask(todo.value, tasks)) {
     todo.value = '';
     setButtonCleanAllVisibility();
+    setLocalStorage(tasks);
   }
 }
 
@@ -59,11 +70,21 @@ function addTask(tasks, todo) {
 
 function addCleanTask() {
   const cleanTasks = document.querySelectorAll('.clean-task');
+  const tasks = document.querySelector('#tasks');
 
   cleanTasks.forEach((cleanTask) => {
     cleanTask.addEventListener('click', (event) => {
       event.target.parentElement.remove();
       setButtonCleanAllVisibility();
+      setLocalStorage(tasks);
     });
   });
+}
+
+function getLocalStorage() {
+  return localStorage.getItem('tasks');
+}
+
+function setLocalStorage(tasks) {
+  localStorage.setItem('tasks', tasks.innerHTML);
 }
