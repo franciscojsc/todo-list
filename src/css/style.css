@@ -1,3 +1,11 @@
+* {
+  font-family: 'Indie Flower', cursive;
+}
+
+input:checked + label {
+  text-decoration: line-through;
+}
+
 .header {
   text-align: center;
 }
@@ -7,8 +15,4 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-input:checked + label {
-  text-decoration: line-through;
 }
