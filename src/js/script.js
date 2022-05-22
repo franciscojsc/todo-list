@@ -1,90 +1,100 @@
+const $form = document.querySelector('form');
+const $todo = document.querySelector('#todo');
+const $tasks = document.querySelector('#tasks');
+const $cleanAll = document.querySelector('#clean-all');
+
 document.body.onload = () => {
-  const tasks = document.querySelector('#tasks');
+  const tasks = getLocalStorage();
 
-  if (getLocalStorage()) {
-    tasks.innerHTML = getLocalStorage();
+  if (!!tasks) {
+    todo.tasks = tasks;
+    createTodoList($tasks);
+    addCleanTask();
+    isCompletedTask();
+    setButtonCleanAllVisibility();
   }
-
-  addCleanTask();
-  setButtonCleanAllVisibility();
 };
 
-function setButtonCleanAllVisibility() {
-  const tasks = document.querySelector('#tasks');
-  const cleanAll = document.querySelector('#clean-all');
-
-  if (tasks.childNodes.length == 0) {
-    cleanAll.style.cssText = 'display: none;';
-  } else {
-    cleanAll.style.cssText = 'display: block; margin: 0 auto;';
-  }
-}
-
-const cleanAll = document.querySelector('#clean-all');
-
-cleanAll.addEventListener('click', (event) => {
-  const tasks = document.querySelector('#tasks');
-  tasks.innerHTML = '';
-  setButtonCleanAllVisibility();
-  setLocalStorage(tasks);
-});
-
-const form = document.querySelector('form');
-
-form.addEventListener('submit', (event) => {
+$form.addEventListener('submit', (event) => {
   event.preventDefault();
-  createTask();
+
+  if ($todo.value) {
+    todo.createTask({
+      content: $todo.value,
+    });
+
+    $todo.value = '';
+    createTodoList();
+    addCleanTask();
+    isCompletedTask();
+    setButtonCleanAllVisibility();
+    setLocalStorage(todo.tasks);
+  }
 });
 
-function createTask() {
-  const tasks = document.querySelector('#tasks');
-  const todo = document.querySelector('#todo');
+$cleanAll.addEventListener('click', () => {
+  $tasks.innerHTML = '';
+  todo.deleteTasks();
+  setButtonCleanAllVisibility();
+  setLocalStorage(todo.tasks);
+});
 
-  if (validateTask(todo.value, tasks)) {
-    todo.value = '';
-    setButtonCleanAllVisibility();
-    setLocalStorage(tasks);
-  }
-}
-
-function validateTask(todo, tasks) {
-  if (!!todo) {
-    addTask(tasks, todo);
-    return true;
-  }
-  return false;
-}
-
-function addTask(tasks, todo) {
-  const idTask = Math.random() * Math.random();
-  tasks.insertAdjacentHTML(
-    'afterbegin',
-    `<div>
-    <input type="checkbox" id="task${idTask}" class="task">
-    <label for="task${idTask}">${todo}</label>
-    <span class="clean-task color-danger">X</span>
-    </div>`
-  );
-  addCleanTask();
+function createTodoList() {
+  $tasks.innerHTML = '';
+  todo.tasks.forEach((task) => {
+    if (task.completed) {
+      $tasks.insertAdjacentHTML(
+        'afterbegin',
+        `<div>
+      <input type="checkbox" id="${task.id}" class="task" checked>
+      <label for="${task.id}">${task.content}</label>
+      <span class="clean-task color-danger">X</span>
+      </div>`
+      );
+    } else {
+      $tasks.insertAdjacentHTML(
+        'afterbegin',
+        `<div>
+      <input type="checkbox" id="${task.id}" class="task">
+      <label for="${task.id}">${task.content}</label>
+      <span class="clean-task color-danger">X</span>
+      </div>`
+      );
+    }
+  });
 }
 
 function addCleanTask() {
-  const cleanTasks = document.querySelectorAll('.clean-task');
-  const tasks = document.querySelector('#tasks');
+  const $cleanTasks = document.querySelectorAll('.clean-task');
 
-  cleanTasks.forEach((cleanTask) => {
+  $cleanTasks.forEach((cleanTask) => {
     cleanTask.addEventListener('click', (event) => {
+      const id = event.target.parentElement.querySelector('input').id;
+      console.log(id);
+      todo.deleteTask(id);
       event.target.parentElement.remove();
-      setButtonCleanAllVisibility();
-      setLocalStorage(tasks);
+      setLocalStorage(todo.tasks);
     });
   });
 }
 
-function getLocalStorage() {
-  return localStorage.getItem('tasks');
+function isCompletedTask() {
+  const $checkboxTasks = document.querySelectorAll('input[type=checkbox]');
+
+  $checkboxTasks.forEach((task) => {
+    task.addEventListener('change', (event) => {
+      const id = event.target.id;
+      const checked = event.target.checked;
+      todo.updateTask(id, { completed: checked });
+      setLocalStorage(todo.tasks);
+    });
+  });
 }
 
-function setLocalStorage(tasks) {
-  localStorage.setItem('tasks', tasks.innerHTML);
+function setButtonCleanAllVisibility() {
+  if (todo.tasks.length == 0) {
+    $cleanAll.style.cssText = 'display: none;';
+  } else {
+    $cleanAll.style.cssText = 'display: block; margin: 0 auto;';
+  }
 }
