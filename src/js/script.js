@@ -11,8 +11,9 @@ document.body.onload = () => {
     createTodoList($tasks);
     addCleanTask();
     isCompletedTask();
-    setButtonCleanAllVisibility();
   }
+
+  setButtonCleanAllVisibility();
 };
 
 $form.addEventListener('submit', (event) => {
